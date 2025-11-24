@@ -2,8 +2,11 @@
 
 namespace Dynamic\Elements\Tabset\Element;
 
+use Override;
+use SilverStripe\Forms\FieldList;
 use DNADesign\ElementalList\Model\ElementList;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 
 /**
  * Class ElementTabSet
@@ -11,39 +14,24 @@ use SilverStripe\ORM\FieldType\DBField;
  */
 class ElementTabSet extends ElementList
 {
-    /**
-     * @var string
-     */
-    private static $icon = 'font-icon-block-layout';
+    private static string $cms_icon_class = 'font-icon-block-layout';
 
-    /**
-     * @var string
-     */
-    private static $table_name = "ElementTabSet";
+    private static string $table_name = "ElementTabSet";
 
-    /**
-     * @var string
-     */
-    private static $singular_name = 'Tabset';
+    private static string $singular_name = 'Tabset';
 
-    /**
-     * @var string
-     */
-    private static $plural_name = 'Tabsets';
+    private static string $plural_name = 'Tabsets';
 
     /**
      * Set to false to prevent an in-line edit form from showing in an elemental area. Instead the element will be
      * clickable and a GridFieldDetailForm will be used.
      *
      * @config
-     * @var bool
      */
-    private static $inline_editable = false;
+    private static bool $inline_editable = false;
 
-    /**
-     * @return \SilverStripe\Forms\FieldList
-     */
-    public function getCMSFields()
+    #[Override]
+    public function getCMSFields(): FieldList
     {
         $fields = parent::getCMSFields();
 
@@ -58,37 +46,39 @@ class ElementTabSet extends ElementList
     /**
      * @return DBHTMLText
      */
+    #[Override]
     public function getSummary(): string
     {
-        if ($this->Elements()) {
-            $ct = $this->Elements()->Elements()->count();
-            if ($ct == 1) {
-                $label = ' tab';
-            } else {
-                $label = ' tabs';
-            }
-            return DBField::create_field(
-                'HTMLText',
-                $ct . $label
-            )->Summary(20);
+        if (!$this->Elements()) {
+            return '';
         }
+
+        $ct = $this->Elements()->Elements()->count();
+
+        if ($ct == 1) {
+            $label = ' tab';
+        } else {
+            $label = ' tabs';
+        }
+
+        return DBField::create_field(
+            'HTMLText',
+            $ct . $label
+        )->Summary(20);
     }
 
-    /**
-     * @return array
-     */
-    protected function provideBlockSchema()
+    #[Override]
+    protected function provideBlockSchema(): array
     {
         $blockSchema = parent::provideBlockSchema();
         $blockSchema['content'] = $this->getSummary();
+
         return $blockSchema;
     }
 
-    /**
-     * @return string
-     */
+    #[Override]
     public function getType(): string
     {
-        return _t(__CLASS__ . '.BlockType', 'TabSet');
+        return _t(self::class . '.BlockType', 'TabSet');
     }
 }
